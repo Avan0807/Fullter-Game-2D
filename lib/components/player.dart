@@ -104,7 +104,8 @@ class Player extends SpriteAnimationGroupComponent
     horizontalMovement += isLeftKeyPressed ? -1 : 0;
     horizontalMovement += isRightKeyPressed ? 1 : 0;
 
-    hasJumped = keysPressed.contains(LogicalKeyboardKey.keyW);
+    hasJumped = keysPressed.contains(LogicalKeyboardKey.keyW) ||
+        keysPressed.contains(LogicalKeyboardKey.arrowUp);
 
     return super.onKeyEvent(event, keysPressed);
   }
@@ -179,13 +180,10 @@ class Player extends SpriteAnimationGroupComponent
       flipHorizontallyAroundCenter();
     }
 
-    // Check if moving, set running
     if (velocity.x > 0 || velocity.x < 0) playerState = PlayerState.running;
 
-    // check if Falling set to falling
     if (velocity.y > 0) playerState = PlayerState.falling;
 
-    // Checks if jumping, set to jumping
     if (velocity.y < 0) playerState = PlayerState.jumping;
 
     current = playerState;
