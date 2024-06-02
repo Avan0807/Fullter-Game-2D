@@ -180,10 +180,13 @@ class Player extends SpriteAnimationGroupComponent
       flipHorizontallyAroundCenter();
     }
 
+    // Check if moving, set running
     if (velocity.x > 0 || velocity.x < 0) playerState = PlayerState.running;
 
+    // check if Falling set to falling
     if (velocity.y > 0) playerState = PlayerState.falling;
 
+    // Checks if jumping, set to jumping
     if (velocity.y < 0) playerState = PlayerState.jumping;
 
     current = playerState;

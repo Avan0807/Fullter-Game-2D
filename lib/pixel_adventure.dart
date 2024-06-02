@@ -1,10 +1,9 @@
 import 'dart:async';
-
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
-import 'package:flutter/painting.dart';
+import 'package:flutter/material.dart';
 import 'package:pixel_adventure/components/jump_button.dart';
 import 'package:pixel_adventure/components/player.dart';
 import 'package:pixel_adventure/components/level.dart';
@@ -17,10 +16,12 @@ class PixelAdventure extends FlameGame
         TapCallbacks {
   @override
   Color backgroundColor() => const Color(0xFF211F30);
+
   late CameraComponent cam;
   Player player = Player(character: 'Mask Dude');
   late JoystickComponent joystick;
-  bool showControls = false;
+  late JumpButton jumpButton;
+  bool showControls = true;  // Set to true to display controls
   bool playSounds = true;
   double soundVolume = 1.0;
   List<String> levelNames = ['Level-01', 'Level-01'];
@@ -35,7 +36,7 @@ class PixelAdventure extends FlameGame
 
     if (showControls) {
       addJoystick();
-      add(JumpButton());
+      addJumpButton();
     }
 
     return super.onLoad();
@@ -51,21 +52,29 @@ class PixelAdventure extends FlameGame
 
   void addJoystick() {
     joystick = JoystickComponent(
-      priority: 10,
+      priority: 1000,  // Ensure priority is high
       knob: SpriteComponent(
         sprite: Sprite(
           images.fromCache('HUD/Knob.png'),
         ),
+        size: Vector2(32, 32),
       ),
       background: SpriteComponent(
         sprite: Sprite(
           images.fromCache('HUD/Joystick.png'),
         ),
+        size: Vector2(64, 64),
       ),
       margin: const EdgeInsets.only(left: 32, bottom: 32),
     );
 
     add(joystick);
+  }
+
+  void addJumpButton() {
+    jumpButton = JumpButton();
+    add(jumpButton);
+    jumpButton.priority = 1000;  // Ensure it has a higher priority than joystick
   }
 
   void updateJoystick() {
@@ -115,5 +124,53 @@ class PixelAdventure extends FlameGame
 
       addAll([cam, world]);
     });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          GameWidget(game: this), // Hiển thị giao diện chơi game
+          Positioned(
+            top: 20,
+            right: 20,
+            child: IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Settings'),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SwitchListTile(
+                            title: Text('Play Sounds'),
+                            value: playSounds,
+                            onChanged: (bool value) {
+                              playSounds = value;
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          ListTile(
+                            title: Text('Exit to Main Menu'),
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
